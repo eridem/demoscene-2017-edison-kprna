@@ -2,110 +2,128 @@
 <html>
 
 <head>
-    <meta charset=utf-8>
-    <title>Edison 2017 | KpRnA</title>
-    <link rel="stylesheet" type="text/css" href="style.css" />
-    <style>    
-    body {
-        overflow:hidden;
-    }
-    </style>
+	<meta charset=utf-8>
+	<title>Edison 2017 | KpRnA</title>
+	<style>
+		body {
+			overflow: hidden;
+			background: black;
+		}
+	</style>
 </head>
 
-<body>
-    <canvas id="canvas"></canvas>
-    <script>
+<body style="position: relative;">
+	<canvas id="canvas" style="position: absolute;"></canvas>
+	<div id="textDiv" style="position: absolute; top: 50%">
+		<p style="text-align: center; font-size: 15em; font-family: Impact; color: black;">KpRñA</p>
+	</div>
+	<script>
+		document.getElementById('textDiv').setAttribute('style', 'width: 100%; position: absolute; top: ' +  window.innerHeight / 4 + 'px; height: ' + window.innerHeight + 'px')
+
+		let SCREEN_WIDTH = window.innerWidth,
+			SCREEN_HEIGHT = window.innerHeight,
+			canvas = document.getElementById('canvas'),
+			context = canvas.getContext('2d')
+
+		const titleScreen = function () {
+
+		}
+
+		const plasmaScreen = function () {
+			const colors = {
+				'000': ['🎱', '🎩', '🐒', '🎬'],  // Black
+				'001': ['🌎', '🌌', '🚘', '📮', '💙'],  // Blue
+				'010': ['👽'],  // Green
+				'011': ['🐟', '🌊', '💧', '💦'],  // Cyan
+				'100': ['🍓'],  // Red
+				'101': ['🌸'],  // Pink
+				'110': ['😀', '😋', '😜', '🚸', '☀️', '💰', '📀', '🐍', '🍋', '🏵'],  // Yellow
+				'111': ['🐑']   // White
+			}
+
+			var SCREEN_WIDTH = window.innerWidth,
+				SCREEN_HEIGHT = window.innerHeight,
+				canvas = document.getElementById('canvas'),
+				context = canvas.getContext('2d'),
+				res = 75,
+				rad = Math.PI / 270,
+				aa = ab = ac = ad = 0,
+				cr = cg = cb = 128, // COLOR
+				a = seed(500),
+				HALF_WIDTH = Math.ceil(SCREEN_WIDTH / res),
+				HALF_HEIGHT = Math.ceil(SCREEN_HEIGHT / res);
+
+			init();
+
+			function init() {
+				canvas.height = SCREEN_HEIGHT;
+				canvas.width = SCREEN_WIDTH;
+
+				plasma();
+			}
+
+			function plasma() {
+
+				for (var x = 0; x < res; x++) {
+
+					aa += 0.0005 * Math.cos(rad * x * a[0]);
+					ac += 0.0010 * Math.sin(rad * (res - x) * a[2]);
+
+					for (var y = 0; y < res; y++) {
+
+						ab += 0.001 * Math.cos(rad * y * a[1]);
+						ad += 0.001 * Math.sin(rad * (res - y) * a[3]);
+
+						var h = x * 8 * Math.sin(rad * (aa + ab) * a[4]),
+							j = y * 8 * Math.cos(rad * (ac + ad) * a[5]),
+							k = (x * a[0] + y * a[1]) * 32 * Math.sin(rad * ((res - x) * h + (y - res) * h) * a[2] / 720),
+							l = (res * a[3] - x * a[3] + (res * a[4] - y * a[4])) * 32 * Math.sin(rad * (x * h + y * j) * a[5] / 720);
+
+						h = 48 * Math.cos(rad * h) + 42 * Math.cos(rad * j);
 
 
-        plasma = function () {
+						cr = 128 + Math.ceil(42 * Math.cos(rad * k) + h);
+						cg = 128 + Math.ceil(42 * Math.cos(rad * l) + h);
+						cb = Math.ceil((cr + cg) / 2 - h * 2);
 
-            const colors = {
-                '000': ['🎱', '🎩', '🐒', '🎬'],  // Black
-                '001': ['🌎', '🌌', '🚘', '📮', '💙'],  // Blue
-                '010': ['👽'],  // Green
-                '011': ['🐟', '🌊', '💧', '💦'],  // Cyan
-                '100': ['🍓'],  // Red
-                '101': ['🌸'],  // Pink
-                '110': ['😀','😋','😜','🚸','☀️','💰','📀', '🐍', '🍋', '🏵'],  // Yellow
-                '111': ['🐑']   // White
-            }
+						let n1 = cr < 127 ? 0 : 1
+						let n2 = cg < 127 ? 0 : 1
+						let n3 = cb < 127 ? 0 : 1
 
-            var SCREEN_WIDTH = window.innerWidth,
-                SCREEN_HEIGHT = window.innerHeight,
-                canvas = document.getElementById('canvas'),
-                context = canvas.getContext('2d'),
-                res = 75,
-                rad = Math.PI / 270,
-                aa = ab = ac = ad = 0,
-                cr = cg = cb = 128, // COLOR
-                a = seed(20),
-                HALF_WIDTH = Math.ceil(SCREEN_WIDTH / res),
-                HALF_HEIGHT = Math.ceil(SCREEN_HEIGHT / res);
+						context.fillStyle = 'rgb(' + cr + ',' + cg + ',' + cb + ')';
+						let colorArray = colors[n1 + '' + n2 + '' + n3]
 
-            init();
+						context.font = "2em 'Segoe UI Emoji'";
+						context.fillText(colorArray[Math.floor(Math.random() * colorArray.length)], y * HALF_WIDTH, x * HALF_HEIGHT);
+						// context.fillRect(y * HALF_WIDTH, x * HALF_HEIGHT, HALF_WIDTH, HALF_HEIGHT);
 
-            function init() {
-                canvas.height = SCREEN_HEIGHT;
-                canvas.width = SCREEN_WIDTH;
+					}
 
-                plasma();
-            }
+				}
 
-            function plasma() {
+				setTimeout(plasma, 20);
+			}
 
-                for (var x = 0; x < res; x++) {
+			function seed(count) {
+				var res = [];
+				for (var i = 0; i < count; i++) {
+					res[i] = Math.ceil(Math.random(0, 1) * 3 + 1);
+				}
+				return res;
+			}
+		}
 
-                    aa += 0.0005 * Math.cos(rad * x * a[0]);
-                    ac += 0.0010 * Math.sin(rad * (res - x) * a[2]);
+		titleScreen()
+		setTimeout(plasmaScreen, 1000)
+	</script>
 
-                    for (var y = 0; y < res; y++) {
+	<script src="resources/tracker.js"></script>
 
-                        ab += 0.001 * Math.cos(rad * y * a[1]);
-                        ad += 0.001 * Math.sin(rad * (res - y) * a[3]);
-
-                        var h = x * 8 * Math.sin(rad * (aa + ab) * a[4]),
-                            j = y * 8 * Math.cos(rad * (ac + ad) * a[5]),
-                            k = (x * a[0] + y * a[1]) * 32 * Math.sin(rad * ((res - x) * h + (y - res) * h) * a[2] / 720),
-                            l = (res * a[3] - x * a[3] + (res * a[4] - y * a[4])) * 32 * Math.sin(rad * (x * h + y * j) * a[5] / 720);
-
-                        h = 48 * Math.cos(rad * h) + 42 * Math.cos(rad * j);
-
-
-                        cr = 128 + Math.ceil(42 * Math.cos(rad * k) + h);
-                        cg = 128 + Math.ceil(42 * Math.cos(rad * l) + h);
-                        cb = Math.ceil((cr + cg) / 2 - h * 2);
-
-                        let n1 = cr < 127 ? 0 : 1
-                        let n2 = cg < 127 ? 0 : 1
-                        let n3 = cb < 127 ? 0 : 1
-
-                        context.fillStyle = 'rgb(' + cr + ',' + cg + ',' + cb + ')';
-                        let colorArray = colors[n1 + '' + n2 + '' + n3]
-
-                        context.font = "2em 'Segoe UI Emoji'";
-                        context.fillText(colorArray[Math.floor(Math.random() * colorArray.length)], y * HALF_WIDTH, x * HALF_HEIGHT);
-                        // context.fillRect(y * HALF_WIDTH, x * HALF_HEIGHT, HALF_WIDTH, HALF_HEIGHT);
-
-                    }
-
-                }
-
-                setTimeout(plasma, 20);
-            }
-
-            function seed(count) {
-                var res = [];
-                for (var i = 0; i < count; i++) {
-                    res[i] = Math.ceil(Math.random(0, 1) * 3 + 1);
-                }
-                return res;
-            }
-
-        }
-
-        plasma()
-
-    </script>
+	<script>
+    var trackerInterval = setInterval(function () {
+        tracker(function(){}, function(){}, function(){}, function(){});
+    }, 100);
+		</script>
 </body>
 
 </html>
